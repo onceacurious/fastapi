@@ -7,6 +7,18 @@ import psycopg2
 from psycopg2.extras import RealDictCursor
 import time
 
+from pathlib import Path
+import json
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+# On Windows
+# f = open('.env\\secret.json')
+f = open('.env\\secret.json')
+secret = json.load(f)
+string = secret['connectionString']
+
+
 app = FastAPI()
 
 
@@ -19,8 +31,8 @@ class Post(BaseModel):
 
 while True:
     try:
-        conn = psycopg2.connect(host='localhost', database='fastapi', user='postgres',
-                                password='fr@nc!s623486', cursor_factory=RealDictCursor)
+        conn = psycopg2.connect(host=string['host'], database=string['database'],
+                                user=string['user'], password=string['password'], cursor_factory=RealDictCursor)
         cursor = conn.cursor()
         print("Successfully conencted to server.")
         break
@@ -28,6 +40,7 @@ while True:
         print("Failed to connect to server")
         print(f"Error was {error}")
         time.sleep(2)
+
 
 my_posts = [
     {"title": "Post 1", "content": "post 1 content", "id": 1},
